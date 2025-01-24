@@ -27,9 +27,9 @@ All required packages will be installed in an environment called "gsca_env".
 
 3. Calculate the weekly median trends at each site for the observed study period (`notebooks/3_calculate_weekly_median_trends`). In other words, stack all years and estimate median transient accumulation area ratios (AARs), snow-covered areas (SCAs), and snowline altitudes for each week of the melt season using Monte Carlo sampling simulations. Weekly median trends may be used to assess typical minimum snow cover extent and timing over the observed time period. 
 
-4. Compare snow cover time series to global glacier model outputs from Rounce et al. (2023)<sup>4</sup> (`notebooks/4_modeled_vs_remote_SMB.ipynb`). Here, we compared the 
+4. Compare snow cover time series to global glacier model outputs from Rounce et al. (2023)<sup>4</sup> (`notebooks/4_modeled_vs_remote_SMB.ipynb`). Here, we compared observed and modeled glacier snowline altitudes and equilibrium line altitudes, and adjusted modeled degree-day factors of snow, which are used to convert air temperatures to surface melt in the surface mass balance model (PyGEM<sup>4</sup>).
 
-5. Make figures for presentations and manuscript (`notebooks/5_make_figures.ipynb`). Here, we compared observed and modeled glacier snowline altitudes and equilibrium line altitudes, and adjusted modeled degree-day factors of snow, which are used to convert air temperatures to surface melt in the surface mass balance model (PyGEM<sup>4</sup>). 
+5. Make figures for presentations and manuscript (`notebooks/5_make_figures.ipynb`).  
 
 ## References
 1. Aberle, R., Enderlin, E. M., & Liu, J. (2024). RaineyAbe/glacier-snow-cover-mapping: Second release (v0.2). Zenodo. https://doi.org/10.5281/zenodo.10616385
