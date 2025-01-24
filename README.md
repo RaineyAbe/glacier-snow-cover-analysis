@@ -39,3 +39,6 @@ All required packages will be installed in an environment called "gsca_env".
 3. Muñoz Sabater, J. (2019). ERA5-Land monthly averaged data from 1950 to present [Data set]. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). https://doi.org/10.24381/cds.68d2bb30
 
 4. Rounce, D. R., Hock, R., Maussion, F., Hugonnet, R., Kochtitzky, W., Huss, M., et al. (2023). Global glacier change in the 21st century: Every increase in temperature matters. Science, 379(6627), 78–83. https://doi.org/10.1126/science.abo1324
+
+## Funding and acknowledgements
+This work was supported by the SMART Scholarship, the Idaho Space Grant Consortium, and NASA EPSCoR award 80NSSC20M0222. Thank you to David Rounce for his assistance with accessing and analyzing the glacier model outputs, and to members of the CryoGARS lab for their support and input throughout this work. 
