@@ -1,0 +1,15 @@
+name: gsca_env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - ipykernel
+  - geopandas
+  - rioxarray
+  - xarray 
+  - earthengine-api
+  - scikit-learn
+  - scipy
+  - matplotlib
+  - seaborn
