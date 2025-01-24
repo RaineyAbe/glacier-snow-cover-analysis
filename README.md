@@ -4,7 +4,7 @@ Rainey Aberle and Ellyn M. Enderlin
 
 [CryoGARS Glaciology](https://github.com/CryoGARS-Glaciology)
 
-![CryoGARS](README_figures/logo_mtns_tagline_smaller.png)
+<img src="README_figures/logo_mtns_blue_smaller.png" alt="CryoGARS" width="200"/>
 
 Tools and notebooks used to analyze snow cover outputs from the [`glacier-snow-cover-mapping`](https://github.com/RaineyAbe/glacier-snow-cover-mapping) package<sup>1,2</sup> for 200 glaciers in western North America.
 
