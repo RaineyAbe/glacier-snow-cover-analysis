@@ -24,7 +24,7 @@ All required packages will be installed in an environment called "gsca_env".
 
 2. Develop climate clusters to categorize the sites based on local climate conditions from ERA5-Land using K-Means clustering (`notebooks/2_develop_climate_cluster.ipynb`). Default predictors are the mean annual air temperature range and precipitation sum. Figure 1 shows an example output after clustering the study sites and assigning names to each cluster. 
 <p style="text-align:center;">
-<img src="README_figures/fig01_study_sites_clusters.png" alt="Climate clusters example" width="500"/>
+<img src="README_figures/fig01_study_sites_clusters.png" alt="Climate clusters example" width="600"/>
 </p> 
 
 *Figure 1. Climate clusters developed for the study sites using mean annual precipitation range and precipitation sums for 2013–2023 using ERA5-Land time series at each site and K-Means clustering. a) Map view of the study site locations. Background image is a shaded relief constructed using the GTOPO digital elevation model courtesy fo the U.S. Geological Survey. Glacier region boundaries are from the Randolph Glacier Inventory v. 6<sup>4</sup>. b) Distribution of the input climate varibales and resulting clusters at each site.*
@@ -39,7 +39,7 @@ All required packages will be installed in an environment called "gsca_env".
 
 4. Compare snow cover time series to global glacier model outputs from Rounce et al. (2023)<sup>5</sup> (`notebooks/4_modeled_vs_remote_SMB.ipynb`). Here, we compared observed and modeled glacier snowline altitudes and equilibrium line altitudes, and adjusted modeled degree-day factors of snow, which are used to convert air temperatures to surface melt in the surface mass balance model (PyGEM<sup>5</sup>). Figure 3 shows the results from the comparison at our study sites. 
 <p style="text-align:center;">
-<img src="README_figures/fig03_modeled_observed_SMB_differences.png" alt="Modeled vs. observed SMB" width="500"/>
+<img src="README_figures/fig03_modeled_observed_SMB_differences.png" alt="Modeled vs. observed SMB" width="600"/>
 </p> 
 
 *Figure 3. Comparison of modeled and observed a) snowline altitudes, b) equilibrium line altitudes (ELAs), c) surface mass balance (SMB) at the observed snowline altitudes, and d) degree-day factors of snow from the global glacier model and adjusted using the seasonal snowline time series.*
