@@ -4,12 +4,16 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
-  - ipykernel
   - geopandas
+  - fiona=1.9
+  - ipykernel
   - rioxarray
-  - xarray 
+  - xarray
+  - netcdf4
+  - h5netcdf
   - earthengine-api
   - scikit-learn
   - scipy
   - matplotlib
   - seaborn
+  - tqdm
