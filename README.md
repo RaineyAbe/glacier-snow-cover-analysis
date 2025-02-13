@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/647398526.svg)](https://zenodo.org/records/14868024)
+
 # `glacier-snow-cover-analysis`
 
 Tools and notebooks used to analyze snow cover outputs from the [`glacier-snow-cover-mapping`](https://github.com/RaineyAbe/glacier-snow-cover-mapping) package<sup>1,2</sup> for 200 glaciers in western North America.
