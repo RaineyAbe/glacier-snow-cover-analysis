@@ -105,7 +105,7 @@ def calculate_sla_bounds(stats_df, dem, snow_cover_mask, dx, verbose=False):
     """
     # Get original snow cover stats and SLA percentile from DataFrame
     aar = stats_df['AAR']
-    sla = stats_df['ELA_from_AAR_m']
+    sla = stats_df['SLA_from_AAR_m']
     sla_percentile = 1 - aar
 
     # Calculate glacier area
