@@ -44,8 +44,18 @@ All required packages will be installed in an environment called "gsca_env".
 
 *Figure 3. Comparison of modeled and observed a) snowline altitudes, b) equilibrium line altitudes (ELAs), c) surface mass balance (SMB) at the observed snowline altitudes, and d) degree-day factors of snow from the global glacier model and adjusted using the seasonal snowline time series.*
 
+5. Uncertainty analysis of snowline altitudes (`notebooks/5_assess_SLA_uncertainty.ipynb`). Snowline altitudes (SLA) were derived from the transient accumulation area ratio time series and the elevation distributions of the study site: 
 
-5. Make figures for presentations and manuscript (`notebooks/5_make_figures.ipynb`).  
+    $SLA = P_{1-AAR}(h)$
+
+    where $P_{1-AAR}$ is 1 minus the transient AAR percentile and $h$ is all elevations in the glacier area. To characterize uncertainties in this method, we identified the areas of snow-free pixels above the SLA and snow-covered pixels below the SLA to place lower and upper bounds on the SLA. Figure 4 shows an example of the SLA with upper and lower bounds calculated for one snow cover obervation at Lemon Creek Glacier, AK. 
+<p style="text-align:center;">
+<img src="README_figures/figS2_SLA_uncertainties_cropped.png" alt="Modeled vs. observed SMB" width="500"/>
+</p> 
+
+*Figure 4. Example snowline altitude (SLA) uncertainty calculation and results for one classified image and snowline altitude at Lemon Creek Glacier, Alaska. (a) ArcticDEM Mosaic<sup>6</sup> clipped to glacier boundaries (ID: 1.01141; RGI Consortium, 2017). (b) Classified image constructed from a Sentinel-2 image captured 2019-07-30 and clipped to glacier boundaries. (c) Histograms of all elevations and snow-covered elevations over the glacier area with the original SLA and lower and upper bounds for the SLA shown as vertical lines.*
+
+6. Make figures for presentations and manuscript (`notebooks/6_make_figures.ipynb`).  
 
 ## Funding and acknowledgements
 This work was supported by the SMART Scholarship, the Idaho Space Grant Consortium, and NASA EPSCoR award 80NSSC20M0222. Thank you to [David Rounce](https://github.com/drounce) for his assistance with accessing and analyzing the glacier model outputs, and to members of the CryoGARS lab for their support and input throughout this project. 
@@ -60,3 +70,5 @@ This work was supported by the SMART Scholarship, the Idaho Space Grant Consorti
 4. RGI Consortium. (2017). Randolph Glacier Inventory - A Dataset of Global Glacier Outlines, Version 6. Boulder, Colorado USA. NSIDC: National Snow and Ice Data Center. Retrieved from https://doi.org/10.7265/4m1f-gd79
 
 5. Rounce, D. R., Hock, R., Maussion, F., Hugonnet, R., Kochtitzky, W., Huss, M., et al. (2023). Global glacier change in the 21st century: Every increase in temperature matters. Science, 379(6627), 78–83. https://doi.org/10.1126/science.abo1324
+
+6. Porter, C., Howat, I., Noh, M.-J., Husby, E., Khuvis, S., Danish, E., et al. (2023). ArcticDEM - Mosaics, Version 4.1 [Data set]. Harvard Dataverse. https://doi.org/10.7910/DVN/3VDC4W
