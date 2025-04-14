@@ -50,7 +50,7 @@ All required packages will be installed in an environment called "gsca_env".
 
     $SLA = P_{1-AAR}(h)$
 
-    where $P_{1-AAR}$ is 1 minus the transient AAR percentile and $h$ is all elevations in the glacier area. To characterize uncertainties in this method, we identified the areas of snow-free pixels above the SLA and snow-covered pixels below the SLA to place lower and upper bounds on the SLA. Figure 4 shows an example of the SLA with upper and lower bounds calculated for one snow cover obervation at Lemon Creek Glacier, AK. 
+    where $P_{1-AAR}$ is 1 minus the transient AAR percentile and $h$ is all elevations in the glacier area. For example, if the transient AAR was 0.8, this means that 80% of the glacier is snow-covered, and the SLA was calculated as the 20th percentile of elevations.To characterize uncertainties in this method, we identified the areas of snow-free pixels above the SLA and snow-covered pixels below the SLA to place lower and upper bounds on the SLA. Figure 4 shows an example of the SLA with upper and lower bounds calculated for one snow cover obervation at Lemon Creek Glacier, AK. 
 <p style="text-align:center;">
 <img src="README_figures/figS2_SLA_uncertainties_cropped.png" alt="Modeled vs. observed SMB" width="500"/>
 </p> 
