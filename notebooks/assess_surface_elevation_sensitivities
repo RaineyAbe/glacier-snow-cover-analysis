@@ -1,0 +1,173 @@
+# /usr/bin/python
+
+# Assess the impact of different surface elevations when comparing remotely-sensed and modeled snowline altitudes
+# Remotely-sensed snowline altitudes (SLAs) were calculated with respect to digital elevation models, whereas model SLAs were calculated with respect to centerline profiles from a smoothed, width-averaged DEM from Hugonnet et al. (2022) at all sites.
+# Thus, re-calculate modeled SLAs using the both the centerline profiles and the site DEM to quantify the impact.
+
+import glob
+import os
+import numpy as np
+import pandas as pd
+import geopandas as gpd
+import xarray as xr
+import rioxarray as rxr
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings('ignore') # prevents printing a warning for converting time precisions every time
+from tqdm.auto import tqdm
+from p_tqdm import p_map
+import multiprocessing
+
+# Define paths for inputs and outputs
+scm_path = '/Volumes/LaCie/raineyaberle/Research/PhD/snow_cover_mapping/'
+model_path = os.path.join(scm_path, 'Rounce_et_al_2023')
+out_path = os.path.join(scm_path, 'analysis')
+code_path = '/Users/raineyaberle/Research/PhD/snow_cover_mapping/glacier-snow-cover-analysis'
+figures_path = os.path.join(code_path, 'figures')
+
+# Load glacier boundaries for RGI IDs
+aois_fn = os.path.join(scm_path, 'analysis', 'AOIs.gpkg')
+aois = gpd.read_file(aois_fn)
+
+# --- Define some helper functions ---
+def estimate_optimal_utm_zone(lon, lat):
+    """Estimate optimal UTM zone EPSG code based on lon/lat."""
+    utm_band = str(int((np.floor((lon + 180) / 6) % 60) + 1))
+    if len(utm_band) == 1:
+        utm_band = '0' + utm_band
+    if lat >= 0:
+        epsg_code = 'EPSG:326' + utm_band
+    else:
+        epsg_code = 'EPSG:327' + utm_band
+    return epsg_code
+
+def water_year(date):
+    """Return the water year for a datetime."""
+    if date.month >= 10:
+        return date.year
+    else:
+        return date.year - 1
+    
+def process_time_step(t, cl_smb, cl_elev, dem, dem_min, dem_max, dem_x_mesh, dem_y_mesh):
+    sla_centerline = np.nan
+    sla_dem = np.nan
+
+    # Centerline SLA computation
+    cl_smb_time = cl_smb.sel(time=t)
+    if np.all(cl_smb_time.data > 0):
+        sla_centerline = np.min(cl_elev)
+    elif np.all(cl_smb_time.data < 0):
+        sla_centerline = np.max(cl_elev)
+    else:
+        sla_centerline = np.interp(0, np.flip(cl_smb_time.data), np.flip(cl_elev))
+
+    # DEM SLA computation
+    smb_dem_time = np.interp(dem.values, np.flip(cl_elev), np.flip(cl_smb_time.values))
+    if np.all(smb_dem_time[~np.isnan(smb_dem_time)] > 0):
+        sla_dem = dem_min
+    elif np.all(smb_dem_time[~np.isnan(smb_dem_time)] < 0):
+        sla_dem = dem_max
+    else:
+        contour = plt.contour(dem_x_mesh, dem_y_mesh, smb_dem_time, levels=[0])
+        plt.close()
+        sla_dem_coords = []
+        for level in contour.allsegs:
+            for segment in level:
+                sla_dem_coords.extend(segment)
+        sla_dem_coords = np.array(sla_dem_coords)
+        if len(sla_dem_coords) < 1:
+            sla_dem = np.nan
+        else:
+            dem_sla_samp = dem.sel(x=sla_dem_coords[:, 0], y=sla_dem_coords[:, 1], method='nearest').data
+            sla_dem = np.nanmedian(dem_sla_samp)
+
+    return sla_centerline, sla_dem
+
+def save_dataframe(df, out_fn):
+    df.reset_index(drop=True, inplace=True)
+    df['SLA_DEM-centerline_mean_m'] = df['SLA_DEM-centerline_mean_m'].round(1)
+    df['SLA_DEM-centerline_median_m'] = df['SLA_DEM-centerline_median_m'].round(1)
+    df.to_csv(out_fn, index=False)
+
+# --- Define output ---
+sla_diffs_fn = os.path.join(out_path, 'SLA_surface_elevations_comparison.csv')
+if os.path.exists(sla_diffs_fn):
+    sla_diffs_df = pd.read_csv(sla_diffs_fn)
+else:
+    sla_diffs_df = pd.DataFrame()
+
+# --- Process each site ---
+for i, rgi_id in enumerate(tqdm(aois['RGIId'].drop_duplicates().values)):
+    # --- Check if site info already exists in dataframe
+    if 'RGIId' in sla_diffs_df.keys():
+        if rgi_id in sla_diffs_df['RGIId'].drop_duplicates().values:
+            continue
+
+    # Skip Hubbard (takes hours because it's so big)
+    if rgi_id=='RGI60-01.14443':
+        continue
+
+    # --- Load site DEM
+    dem_fn = glob.glob(os.path.join(scm_path, 'study-sites', rgi_id, 'DEMs', '*.tif'))[0]
+    dem = rxr.open_rasterio(dem_fn, chunks={'x': 100, 'y': 100}).squeeze()
+    # reproject to optimal UTM zone for better interpolation
+    dem = dem.rio.reproject('EPSG:4326')
+    crs_utm = estimate_optimal_utm_zone(dem.x.data.mean(), dem.y.data.mean())
+    dem = dem.rio.reproject(crs_utm)
+    # remove no data or invalid values
+    dem = xr.where((dem < -1e3) | (dem > 1e4), np.nan, dem)
+    if 'band' in dem.coords:
+        if len(np.shape(dem.band)) > 0:
+            dem = dem.isel(band=0)
+    
+    # --- Load modeled monthly SMB
+    smb_fn = glob.glob(os.path.join(model_path, 'glac_SMB_binned', f"{rgi_id.split('RGI60-0')[1]}*.nc"))[0]
+    smb = xr.open_dataset(smb_fn, chunks={'x': 100, 'y': 100})
+    smb['time'] = smb.time.values.astype('datetime64[D]')
+    smb = smb.isel(glac=0)
+    # Calculate cumulative monthly SMB by water year
+    smb = smb.assign_coords({'water_year': (['time'], [water_year(pd.Timestamp(t)) for t in smb.time.values])})
+    smb['bin_massbalclim_monthly_cumsum'] = smb['bin_massbalclim_monthly'].groupby('water_year').cumsum()
+
+    # --- Prep variables for processing
+    # select centerline elevations and cumulative SMB
+    cl_elev = smb['bin_surface_h_initial'].values
+    cl_smb = smb['bin_massbalclim_monthly_cumsum']
+    # create meshgrid for sampling the DEM later
+    dem_x_mesh, dem_y_mesh = np.meshgrid(dem.x.data, dem.y.data)
+    # save min and max elevations
+    dem_min, dem_max = float(dem.min()), float(dem.max())
+
+    # --- Estimate SLAs for each time step in parallel
+    slas_centerline = np.nan * np.zeros(len(cl_smb.time))
+    slas_dem = np.nan * np.zeros(len(cl_smb.time))
+    for j, t in enumerate(cl_smb.time):
+        slas_centerline[j], slas_dem[j] = process_time_step(t, cl_smb, cl_elev, dem, dem_min, dem_max, dem_x_mesh, dem_y_mesh)
+    
+    # --- Calculate median and mean differences
+    sla_diffs = slas_dem - slas_centerline
+    df = pd.DataFrame({'RGIId': [rgi_id],
+                       'SLA_DEM-centerline_mean_m': [np.nanmean(sla_diffs)],
+                       'SLA_DEM-centerline_median_m': [np.nanmedian(sla_diffs)]})
+    sla_diffs_df = pd.concat([sla_diffs_df, df], ignore_index=True)
+
+    # Save to file now in case there's an error later
+    save_dataframe(sla_diffs_df, sla_diffs_fn)
+
+# --- Reduce precision to nearest decimeter
+sla_diffs_df.reset_index(drop=True, inplace=True)
+sla_diffs_df['SLA_DEM-centerline_mean_m'] = sla_diffs_df['SLA_DEM-centerline_mean_m'].round(1)
+sla_diffs_df['SLA_DEM-centerline_median_m'] = sla_diffs_df['SLA_DEM-centerline_median_m'].round(1)
+
+print('DEM - centerline SLA median difference = ', np.round(sla_diffs_df['SLA_DEM-centerline_median_m'].median(),2), 'm')
+print('DEM - centerline SLA mean difference = ', np.round(sla_diffs_df['SLA_DEM-centerline_mean_m'].mean(),2), 'm')
+
+# --- Save final dataframe to file
+sla_diffs_df.to_csv(sla_diffs_fn, index=False)
+print('SLA difference metrics saved to file:', sla_diffs_fn)
+
+# --- Plot histogram
+plt.hist(sla_diffs_df['SLA_DEM-centerline_median_m'], bins=100)
+plt.ylabel('Mean difference [m]')
+plt.title('SLAs from DEM - SLAs from centerline')
+plt.show()
