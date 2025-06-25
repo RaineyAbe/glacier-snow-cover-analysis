@@ -153,10 +153,9 @@ def save_classified_image(ds, rgi_id, epsg_utm, out_fn):
     # Assign global attributes
     ds.attrs['title'] = 'Land cover classifications and snow cover stastics'
     ds.attrs['description'] = 'Land cover classifications and snow cover statistics constructed using the glacier-snow-cover-mapping package (https://github.com/RaineyAbe/glacier-snow-cover-mapping).'
-    ds.attrs['citation'] = 'TBD'
+    ds.attrs['references'] = 'doi:10.1029/2025GL115523'
     ds.attrs['horizontal_CRS'] = 'WGS84 (EPSG:4326)'
-    ds.attrs['vertical_CRS'] = 'Heights associated with the snow cover elevations at all sites are with respect to the EGM96 geoid (EPSG:5773).'
-    ds.attrs['summary'] = 'Classified image resulting from the snow classification workflow.'
+    ds.attrs['vertical_CRS'] = 'EGM96 geoid (EPSG:5773)'
     ds.attrs['date_modified'] = '2025-06-07'
     ds.attrs['time_coverage_start'] = '2013-05-01'
     ds.attrs['time_coverage_end'] = '2023-10-31'
@@ -175,6 +174,9 @@ def save_classified_image(ds, rgi_id, epsg_utm, out_fn):
     ds['SLA_lower_bound'].attrs['units'] = 'meters above sea level'
     ds['SLA_upper_bound'].attrs['long_name'] = 'snowline altitude upper bound'
     ds['SLA_upper_bound'].attrs['units'] = 'meters above sea level'
+    ds['glacier_area'].attrs['units'] = 'meters above sea level'
+    ds['glacier_area'].attrs['long_name'] = 'glacier area'
+    ds['glacier_area'].attrs['description'] = 'snow area + ice area'
     for dv in ['snow_area', 'ice_area', 'rock_area', 'water_area']:
         ds[dv].attrs['units'] = 'meters squared'
         ds[dv].attrs['long_name'] = (dv).split('_')[0] + ' cover area'
@@ -185,9 +187,6 @@ def save_classified_image(ds, rgi_id, epsg_utm, out_fn):
     # Make sure no empty "spatial_ref" coordinate
     if 'spatial_ref' in ds.coords:
         ds = ds.drop_vars('spatial_ref')
-
-    # Make sure CRS is set
-    ds = ds.rio.write_crs(epsg_utm)
 
     # Save to file
     if '.nc' in out_fn:
